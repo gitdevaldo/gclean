@@ -1,65 +1,49 @@
-# Email Validation API
+# Email Validation Service
 
-Email Validation API is a service that checks an email input and returns a clear validation result for your app or workflow.
+This service helps you decide whether an email is safe and usable before you accept it in your product flow.
 
-## Service overview
+## What the service does
 
-This service is built for one job: receive an email, evaluate it, and return a consistent result.
+The service reviews each email and returns a final pass/fail decision so teams can reduce fake signups, low-quality leads, and delivery issues.
 
-Core value:
+It is designed for:
 
-- Simple integration for product teams
-- Predictable response format
-- Health endpoint for service status
+- Signup and onboarding checks
+- Lead form quality control
+- CRM and contact list cleanup
+- Fraud and abuse prevention
 
-## How the service works
+## What we check
 
-1. Send an email to the validation endpoint.
-2. The service checks the email.
-3. You receive a response with `email` and `valid`.
+Each email goes through multiple checks, including:
 
-## API endpoints
+- **Temporary email detection**  
+  Flags addresses from disposable or short-lived mailbox providers.
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/health` | Health check endpoint |
-| `POST` | `/v1/validate-email` | Validate an email address |
+- **SMTP mailbox check**  
+  Verifies whether the destination mail system can receive messages for that address.
 
-## Validate email
+- **DLL screening**  
+  Screens the domain against known risky, disposable, or blocked-domain lists (DLL).
 
-### Request
+- **Basic quality signals**  
+  Looks for common patterns that indicate low-trust or non-usable addresses.
 
-`POST /v1/validate-email`
+## Checking flow
 
-```json
-{
-  "email": "hello@example.com"
-}
-```
+1. The email is received by the service.
+2. The service runs all validation signals in sequence.
+3. Results are combined into one overall trust decision.
+4. A final status is returned for downstream action.
 
-### Success response
+## How we conclude the result
 
-```json
-{
-  "email": "hello@example.com",
-  "valid": true
-}
-```
+The final result is based on all checks together, not a single signal.
 
-### Error response
+- **Valid**: no critical issues found, email is safe to use.
+- **Invalid**: one or more hard-fail checks triggered.
+- **Risky**: usable but high-risk indicators are present.
 
-```json
-{
-  "error": "email must not be empty"
-}
-```
+## Why this helps
 
-## Health check
-
-`GET /health`
-
-```json
-{
-  "status": "ok"
-}
-```
+Using this service early in your flow improves data quality, protects sender reputation, and reduces wasted follow-up on unreachable or disposable addresses.
