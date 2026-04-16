@@ -1,62 +1,57 @@
-# Email Validator API (Rust)
+# Email Validation Service
 
-Production-ready scaffold for an email validation API service.
+This service checks an email input and returns a simple validation result that your application can consume.
 
-## Current behavior
+## What this service provides
 
-`POST /v1/validate-email` accepts an email and returns:
+- A single API to submit an email and get a yes/no validation result.
+- A consistent JSON response contract for easy integration with frontend, backend, or automation workflows.
+- A health endpoint so you can quickly confirm the service is up.
+
+## How email checking works (current phase)
+
+For now, the validation decision is a **simulation** and returned randomly (`true` or `false`).
+
+This is intentional so you can already integrate with the API contract while real validation logic is being prepared.
+
+## How to check an email
+
+Send a `POST` request to:
+
+`/v1/validate-email`
+
+with body:
 
 ```json
 {
-  "email": "user@example.com",
+  "email": "hello@example.com"
+}
+```
+
+The service returns:
+
+```json
+{
+  "email": "hello@example.com",
   "valid": true
 }
 ```
 
-The `valid` result is intentionally random for now.
+## Result meaning
 
-## API endpoints
+- `valid: true` means the email passed the current check.
+- `valid: false` means the email did not pass the current check.
 
-- `GET /health`
-- `POST /v1/validate-email`
+## Service health check
 
-### Request body
+Use:
 
-```json
-{
-  "email": "user@example.com"
-}
-```
+`GET /health`
 
-### Response body
+Expected response:
 
 ```json
 {
-  "email": "user@example.com",
-  "valid": false
+  "status": "ok"
 }
-```
-
-## Configuration
-
-Environment variables:
-
-- `APP_HOST` (default: `0.0.0.0`)
-- `APP_PORT` (default: `8080`)
-- `APP_REQUEST_TIMEOUT_SECONDS` (default: `10`)
-- `RUST_LOG` (default: `info`)
-
-## Run
-
-```bash
-cargo run
-```
-
-## Quick check
-
-```bash
-curl -sS http://127.0.0.1:8080/health
-curl -sS -X POST http://127.0.0.1:8080/v1/validate-email \
-  -H 'content-type: application/json' \
-  -d '{"email":"hello@example.com"}'
 ```
