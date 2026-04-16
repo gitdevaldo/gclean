@@ -1,32 +1,22 @@
 # Email Validation API
 
-Email Validation API is a lightweight HTTP service for validating email input and returning a clear boolean result that can be consumed by web apps, backend systems, and automation flows.
+Email Validation API is a service that checks an email input and returns a clear validation result for your app or workflow.
 
 ## Service overview
 
-This API is built for one job: receive an email, evaluate it, and return a consistent response contract.
+This service is built for one job: receive an email, evaluate it, and return a consistent result.
 
-Core capabilities:
+Core value:
 
-- Fast validation response for API clients
-- Stable JSON contract (`email`, `valid`)
-- Health endpoint for uptime checks and monitoring
-- Operational defaults suitable for production deployment
-
-## Technology stack
-
-- **Language:** Rust
-- **HTTP framework:** Axum
-- **Runtime:** Tokio
-- **Middleware:** Tower / Tower HTTP
-- **Observability:** Tracing (structured logs)
+- Simple integration for product teams
+- Predictable response format
+- Health endpoint for service status
 
 ## How the service works
 
-1. Client sends a `POST` request with an email payload.
-2. Service reads and normalizes the input.
-3. Validation engine returns a boolean decision.
-4. API responds with the original email and `valid: true/false`.
+1. Send an email to the validation endpoint.
+2. The service checks the email.
+3. You receive a response with `email` and `valid`.
 
 ## API endpoints
 
@@ -56,7 +46,7 @@ Core capabilities:
 }
 ```
 
-### Error response example
+### Error response
 
 ```json
 {
@@ -73,26 +63,3 @@ Core capabilities:
   "status": "ok"
 }
 ```
-
-## Local run
-
-```bash
-cargo run
-```
-
-## Example usage
-
-```bash
-curl -sS -X POST http://127.0.0.1:8080/v1/validate-email \
-  -H 'content-type: application/json' \
-  -d '{"email":"hello@example.com"}'
-```
-
-## Configuration
-
-| Variable | Default | Description |
-| --- | --- | --- |
-| `APP_HOST` | `0.0.0.0` | Service bind host |
-| `APP_PORT` | `8080` | Service bind port |
-| `APP_REQUEST_TIMEOUT_SECONDS` | `10` | Request timeout |
-| `RUST_LOG` | `info` | Log verbosity level |
