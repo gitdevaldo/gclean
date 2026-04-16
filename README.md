@@ -1,26 +1,45 @@
-# Email Validation Service
+# Email Validation API
 
-This service checks an email input and returns a simple validation result that your application can consume.
+Email Validation API is a lightweight HTTP service for validating email input and returning a clear boolean result that can be consumed by web apps, backend systems, and automation flows.
 
-## What this service provides
+## Service overview
 
-- A single API to submit an email and get a yes/no validation result.
-- A consistent JSON response contract for easy integration with frontend, backend, or automation workflows.
-- A health endpoint so you can quickly confirm the service is up.
+This API is built for one job: receive an email, evaluate it, and return a consistent response contract.
 
-## How email checking works (current phase)
+Core capabilities:
 
-For now, the validation decision is a **simulation** and returned randomly (`true` or `false`).
+- Fast validation response for API clients
+- Stable JSON contract (`email`, `valid`)
+- Health endpoint for uptime checks and monitoring
+- Operational defaults suitable for production deployment
 
-This is intentional so you can already integrate with the API contract while real validation logic is being prepared.
+## Technology stack
 
-## How to check an email
+- **Language:** Rust
+- **HTTP framework:** Axum
+- **Runtime:** Tokio
+- **Middleware:** Tower / Tower HTTP
+- **Observability:** Tracing (structured logs)
 
-Send a `POST` request to:
+## How the service works
 
-`/v1/validate-email`
+1. Client sends a `POST` request with an email payload.
+2. Service reads and normalizes the input.
+3. Validation engine returns a boolean decision.
+4. API responds with the original email and `valid: true/false`.
 
-with body:
+## API endpoints
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Health check endpoint |
+| `POST` | `/v1/validate-email` | Validate an email address |
+
+## Validate email
+
+### Request
+
+`POST /v1/validate-email`
 
 ```json
 {
@@ -28,7 +47,7 @@ with body:
 }
 ```
 
-The service returns:
+### Success response
 
 ```json
 {
@@ -37,21 +56,43 @@ The service returns:
 }
 ```
 
-## Result meaning
+### Error response example
 
-- `valid: true` means the email passed the current check.
-- `valid: false` means the email did not pass the current check.
+```json
+{
+  "error": "email must not be empty"
+}
+```
 
-## Service health check
-
-Use:
+## Health check
 
 `GET /health`
-
-Expected response:
 
 ```json
 {
   "status": "ok"
 }
 ```
+
+## Local run
+
+```bash
+cargo run
+```
+
+## Example usage
+
+```bash
+curl -sS -X POST http://127.0.0.1:8080/v1/validate-email \
+  -H 'content-type: application/json' \
+  -d '{"email":"hello@example.com"}'
+```
+
+## Configuration
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `APP_HOST` | `0.0.0.0` | Service bind host |
+| `APP_PORT` | `8080` | Service bind port |
+| `APP_REQUEST_TIMEOUT_SECONDS` | `10` | Request timeout |
+| `RUST_LOG` | `info` | Log verbosity level |
