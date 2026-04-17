@@ -6,8 +6,8 @@ use reqwest::StatusCode;
 use tracing::info;
 
 use crate::config::{
-    actor_input_key, apify_api_base_url, default_dataset_dir, default_key_value_store_id,
-    input_file_candidates,
+    actor_input_key, apify_api_base_url, default_dataset_dir, default_dataset_id,
+    default_key_value_store_id, input_file_candidates,
 };
 use crate::error::ActorError;
 use crate::models::{ActorInput, ValidationResponse};
@@ -25,8 +25,7 @@ pub async fn run() -> Result<(), ActorError> {
         results.push(result);
     }
 
-    let dataset_writer = DatasetWriter::new(default_dataset_dir())?;
-    dataset_writer.append(&results)?;
+    append_results(&results).await?;
 
     info!(items = results.len(), "actor run completed");
     let output_json = serde_json::to_string(&results).map_err(ActorError::SerializeDatasetItem)?;
@@ -104,6 +103,50 @@ async fn load_input_from_apify_api() -> Result<Option<String>, ActorError> {
 
     let payload = response.text().await.map_err(ActorError::FetchApifyInput)?;
     Ok(Some(payload))
+}
+
+async fn append_results(items: &[ValidationResponse]) -> Result<(), ActorError> {
+    if append_results_to_apify_api(items).await? {
+        return Ok(());
+    }
+
+    let dataset_writer = DatasetWriter::new(default_dataset_dir())?;
+    dataset_writer.append(items)
+}
+
+async fn append_results_to_apify_api(items: &[ValidationResponse]) -> Result<bool, ActorError> {
+    let token = match env::var("APIFY_TOKEN").ok() {
+        Some(value) if !value.trim().is_empty() => value,
+        _ => return Ok(false),
+    };
+
+    let Some(base_url) = apify_api_base_url() else {
+        return Ok(false);
+    };
+
+    let dataset_id = default_dataset_id();
+    let url = format!(
+        "{}/v2/datasets/{}/items",
+        base_url.trim_end_matches('/'),
+        dataset_id
+    );
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .bearer_auth(token)
+        .json(items)
+        .send()
+        .await
+        .map_err(ActorError::StoreDatasetItems)?;
+
+    if !response.status().is_success() {
+        return Err(ActorError::StoreDatasetItemsStatus {
+            url,
+            status: response.status().as_u16(),
+        });
+    }
+
+    Ok(true)
 }
 
 fn normalize_emails(input: ActorInput) -> Result<Vec<String>, ActorError> {

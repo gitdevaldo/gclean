@@ -23,6 +23,10 @@ pub enum ActorError {
     FetchApifyInput(reqwest::Error),
     #[error("failed to fetch actor input from Apify API ({url}): HTTP {status}")]
     FetchApifyInputStatus { url: String, status: u16 },
+    #[error("failed to store dataset items via Apify API: {0}")]
+    StoreDatasetItems(reqwest::Error),
+    #[error("failed to store dataset items via Apify API ({url}): HTTP {status}")]
+    StoreDatasetItemsStatus { url: String, status: u16 },
     #[error("request to validation API failed: {0}")]
     RequestFailed(#[from] reqwest::Error),
     #[error("failed to create dataset directory {path}: {source}")]
