@@ -34,23 +34,48 @@
             },
             "flags_disposable": {
                 "type": "string",
-                "title": "Flag Disposable"
+                "title": "Flag Disposable",
+                "enum": [
+                    "true",
+                    "false",
+                    "null"
+                ]
             },
             "flags_role_based": {
                 "type": "string",
-                "title": "Flag Role Based"
+                "title": "Flag Role Based",
+                "enum": [
+                    "true",
+                    "false",
+                    "null"
+                ]
             },
             "flags_catch_all": {
                 "type": "string",
-                "title": "Flag Catch All"
+                "title": "Flag Catch All",
+                "enum": [
+                    "true",
+                    "false",
+                    "null"
+                ]
             },
             "flags_spam_trap": {
                 "type": "string",
-                "title": "Flag Spam Trap"
+                "title": "Flag Spam Trap",
+                "enum": [
+                    "true",
+                    "false",
+                    "null"
+                ]
             },
             "flags_pwned_signal": {
                 "type": "string",
-                "title": "Flag Pwned Signal"
+                "title": "Flag Pwned Signal",
+                "enum": [
+                    "true",
+                    "false",
+                    "null"
+                ]
             }
         },
         "required": [

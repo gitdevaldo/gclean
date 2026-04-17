@@ -59,11 +59,11 @@ fn map_dataset_result(payload: ValidationApiResponse) -> Result<DatasetResult, A
             email,
             status: valid.to_string(),
             valid: valid.to_string(),
-            flags_disposable: None,
-            flags_role_based: None,
-            flags_catch_all: None,
-            flags_spam_trap: None,
-            flags_pwned_signal: None,
+            flags_disposable: "null".to_string(),
+            flags_role_based: "null".to_string(),
+            flags_catch_all: "null".to_string(),
+            flags_spam_trap: "null".to_string(),
+            flags_pwned_signal: "null".to_string(),
         }),
         ValidationApiResponse::Error { .. } => Ok(empty_error_result()),
     }
@@ -78,8 +78,11 @@ fn normalize_status(status: &str, valid: bool) -> String {
     }
 }
 
-fn bool_to_text(value: Option<bool>) -> Option<String> {
-    value.map(|v| v.to_string())
+fn bool_to_text(value: Option<bool>) -> String {
+    match value {
+        Some(v) => v.to_string(),
+        None => "null".to_string(),
+    }
 }
 
 fn empty_error_result() -> DatasetResult {
@@ -87,11 +90,11 @@ fn empty_error_result() -> DatasetResult {
         email: String::new(),
         status: "error".to_string(),
         valid: "error".to_string(),
-        flags_disposable: None,
-        flags_role_based: None,
-        flags_catch_all: None,
-        flags_spam_trap: None,
-        flags_pwned_signal: None,
+        flags_disposable: "null".to_string(),
+        flags_role_based: "null".to_string(),
+        flags_catch_all: "null".to_string(),
+        flags_spam_trap: "null".to_string(),
+        flags_pwned_signal: "null".to_string(),
     }
 }
 
@@ -128,5 +131,6 @@ mod tests {
         assert_eq!(mapped.email, "user@example.com".to_string());
         assert_eq!(mapped.status, "false".to_string());
         assert_eq!(mapped.valid, "false".to_string());
+        assert_eq!(mapped.flags_disposable, "null".to_string());
     }
 }

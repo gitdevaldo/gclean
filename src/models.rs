@@ -52,14 +52,9 @@ pub struct DatasetResult {
     pub email: String,
     pub status: String,
     pub valid: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub flags_disposable: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub flags_role_based: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub flags_catch_all: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub flags_spam_trap: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub flags_pwned_signal: Option<String>,
+    pub flags_disposable: String,
+    pub flags_role_based: String,
+    pub flags_catch_all: String,
+    pub flags_spam_trap: String,
+    pub flags_pwned_signal: String,
 }
