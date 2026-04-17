@@ -1,0 +1,232 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+            "email": {
+                "type": "string",
+                "title": "Email",
+                "description": "Email address that was evaluated.",
+                "example": "hello@example.com"
+            },
+            "valid": {
+                "type": "boolean",
+                "title": "Valid",
+                "description": "Overall decision: true when the email passed validation.",
+                "example": true
+            },
+            "status": {
+                "type": "string",
+                "title": "Status",
+                "description": "Final classification derived from all checks.",
+                "enum": [
+                    "valid",
+                    "invalid",
+                    "risky"
+                ],
+                "example": "valid"
+            },
+            "riskLevel": {
+                "type": "string",
+                "title": "Risk level",
+                "description": "Risk assessment of the email after all checks.",
+                "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                ],
+                "example": "low"
+            },
+            "conclusion": {
+                "type": "string",
+                "title": "Conclusion",
+                "description": "Human-readable summary of the final decision.",
+                "example": "Email passed temporary-email, SMTP, and DLL checks."
+            },
+            "checks": {
+                "type": "object",
+                "title": "Checks",
+                "description": "Detailed results for each validation signal.",
+                "properties": {
+                    "temporaryEmail": {
+                        "type": "boolean",
+                        "title": "Temporary email",
+                        "description": "True if the email belongs to a disposable provider.",
+                        "example": false
+                    },
+                    "smtpReachable": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ],
+                        "title": "SMTP reachable",
+                        "description": "True if destination mail server appears reachable and accepting mail.",
+                        "example": true
+                    },
+                    "dllListed": {
+                        "type": "boolean",
+                        "title": "DLL listed",
+                        "description": "True if domain appears on a risky or blocked-domain list.",
+                        "example": false
+                    }
+                },
+                "required": [
+                    "temporaryEmail",
+                    "smtpReachable",
+                    "dllListed"
+                ]
+            },
+            "reasons": {
+                "type": "array",
+                "title": "Reasons",
+                "description": "Reasons that explain the final status.",
+                "items": {
+                    "type": "string"
+                },
+                "example": [
+                    "SMTP server accepted mailbox",
+                    "Domain not present on DLL"
+                ]
+            },
+            "checkedAt": {
+                "type": "string",
+                "title": "Checked at",
+                "description": "Timestamp when validation was completed.",
+                "format": "date-time",
+                "example": "2026-04-16T21:05:00.000Z"
+            }
+        },
+        "required": [
+            "email",
+            "valid",
+            "status",
+            "checks",
+            "checkedAt"
+        ]
+    },
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "description": "Complete validation results for all processed emails.",
+            "transformation": {
+                "flatten": [
+                    "checks"
+                ],
+                "fields": [
+                    "email",
+                    "status",
+                    "valid",
+                    "riskLevel",
+                    "checks.temporaryEmail",
+                    "checks.smtpReachable",
+                    "checks.dllListed",
+                    "conclusion",
+                    "reasons",
+                    "checkedAt"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "email": {
+                        "label": "Email",
+                        "format": "text"
+                    },
+                    "status": {
+                        "label": "Status",
+                        "format": "text"
+                    },
+                    "valid": {
+                        "label": "Valid",
+                        "format": "boolean"
+                    },
+                    "riskLevel": {
+                        "label": "Risk",
+                        "format": "text"
+                    },
+                    "checks.temporaryEmail": {
+                        "label": "Temp Mail",
+                        "format": "boolean"
+                    },
+                    "checks.smtpReachable": {
+                        "label": "SMTP",
+                        "format": "boolean"
+                    },
+                    "checks.dllListed": {
+                        "label": "DLL Listed",
+                        "format": "boolean"
+                    },
+                    "conclusion": {
+                        "label": "Conclusion",
+                        "format": "text"
+                    },
+                    "reasons": {
+                        "label": "Reasons",
+                        "format": "array"
+                    },
+                    "checkedAt": {
+                        "label": "Checked At",
+                        "format": "date"
+                    }
+                }
+            }
+        },
+        "actionable": {
+            "title": "Actionable",
+            "description": "Highlights only risky and invalid emails for review.",
+            "transformation": {
+                "flatten": [
+                    "checks"
+                ],
+                "fields": [
+                    "email",
+                    "status",
+                    "riskLevel",
+                    "checks.temporaryEmail",
+                    "checks.smtpReachable",
+                    "checks.dllListed",
+                    "conclusion",
+                    "checkedAt"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "email": {
+                        "label": "Email",
+                        "format": "text"
+                    },
+                    "status": {
+                        "label": "Status",
+                        "format": "text"
+                    },
+                    "riskLevel": {
+                        "label": "Risk",
+                        "format": "text"
+                    },
+                    "checks.temporaryEmail": {
+                        "label": "Temp Mail",
+                        "format": "boolean"
+                    },
+                    "checks.smtpReachable": {
+                        "label": "SMTP",
+                        "format": "boolean"
+                    },
+                    "checks.dllListed": {
+                        "label": "DLL Listed",
+                        "format": "boolean"
+                    },
+                    "conclusion": {
+                        "label": "Conclusion",
+                        "format": "text"
+                    },
+                    "checkedAt": {
+                        "label": "Checked At",
+                        "format": "date"
+                    }
+                }
+            }
+        }
+    }
+}

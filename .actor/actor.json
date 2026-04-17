@@ -1,0 +1,10 @@
+{
+    "actorSpecification": 1,
+    "name": "email-validation-service",
+    "title": "Email Validation Service",
+    "version": "1.0.0",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
+}

@@ -1,0 +1,69 @@
+{
+    "title": "Email Validation Service Input",
+    "description": "Provide one or more emails to validate and choose how strict the evaluation should be.",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "emails": {
+            "title": "Emails",
+            "type": "array",
+            "description": "List of email addresses to validate.",
+            "items": {
+                "type": "string",
+                "title": "Email address"
+            },
+            "prefill": [
+                "hello@example.com"
+            ]
+        },
+        "validationProfile": {
+            "title": "Validation profile",
+            "type": "string",
+            "description": "Controls how strict the final decision should be.",
+            "enum": [
+                "balanced",
+                "strict",
+                "deliverability-first"
+            ],
+            "enumTitles": [
+                "Balanced",
+                "Strict",
+                "Deliverability First"
+            ],
+            "default": "balanced"
+        },
+        "checkTemporaryEmail": {
+            "title": "Check temporary email providers",
+            "type": "boolean",
+            "description": "Detects whether an email uses a disposable or short-lived mailbox provider.",
+            "default": true
+        },
+        "checkSmtp": {
+            "title": "Check SMTP reachability",
+            "type": "boolean",
+            "description": "Checks whether the destination mail system is reachable and appears to accept messages.",
+            "default": true
+        },
+        "checkDll": {
+            "title": "Check DLL/domain blocklists",
+            "type": "boolean",
+            "description": "Screens domains against known risky or blocked-domain lists.",
+            "default": true
+        },
+        "deduplicateEmails": {
+            "title": "Remove duplicates",
+            "type": "boolean",
+            "description": "Processes each unique email only once per run.",
+            "default": true
+        },
+        "includeReasonDetails": {
+            "title": "Include reason details",
+            "type": "boolean",
+            "description": "Includes human-readable reasons that explain how each decision was reached.",
+            "default": true
+        }
+    },
+    "required": [
+        "emails"
+    ]
+}
