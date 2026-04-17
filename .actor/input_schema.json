@@ -16,8 +16,7 @@
             "type": "array",
             "description": "List of email addresses to validate.",
             "items": {
-                "type": "string",
-                "title": "Email address"
+                "type": "string"
             },
             "prefill": [
                 "hello@example.com"
