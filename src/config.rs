@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 pub const VALIDATION_API_URL: &str = "https://zrbot.devaldo.workers.dev/v1/validate-email";
 pub const REQUEST_TIMEOUT_SECONDS: u64 = 15;
+pub const REQUEST_DELAY_SECONDS: u64 = 1;
 pub const DEFAULT_LOG_LEVEL: &str = "info";
 
 pub fn actor_input_key() -> String {

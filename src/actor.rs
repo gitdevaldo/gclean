@@ -3,11 +3,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use reqwest::StatusCode;
+use tokio::time::{sleep, Duration};
 use tracing::info;
 
 use crate::config::{
     actor_input_key, apify_api_base_url, default_dataset_dir, default_dataset_id,
-    default_key_value_store_id, input_file_candidates,
+    default_key_value_store_id, input_file_candidates, REQUEST_DELAY_SECONDS,
 };
 use crate::error::ActorError;
 use crate::models::{ActorInput, DatasetResult, ValidationResponse};
@@ -24,6 +25,7 @@ pub async fn run() -> Result<(), ActorError> {
         let response = service.validate(email.clone(), &api_token).await?;
         let status = status_from_response(response);
         results.push(DatasetResult { email, status });
+        sleep(Duration::from_secs(REQUEST_DELAY_SECONDS)).await;
     }
 
     append_results(&results).await?;
