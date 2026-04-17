@@ -18,10 +18,7 @@
             "description": "List of email addresses to validate.",
             "items": {
                 "type": "string"
-            },
-            "prefill": [
-                "hello@example.com"
-            ]
+            }
         }
     }
 }
