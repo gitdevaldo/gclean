@@ -6,8 +6,6 @@ pub struct ActorInput {
     pub email: Option<String>,
     #[serde(default)]
     pub emails: Vec<String>,
-    #[serde(default, rename = "apiToken")]
-    pub api_token: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

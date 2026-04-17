@@ -11,7 +11,8 @@ use crate::service::EmailValidationService;
 
 pub async fn run() -> Result<(), ActorError> {
     let input = load_input()?;
-    let (emails, api_token) = normalize_input(input)?;
+    let emails = normalize_emails(input)?;
+    let api_token = normalize_api_token(env::var("VALIDATION_API_TOKEN").ok())?;
     let service = EmailValidationService::new()?;
 
     let mut results = Vec::with_capacity(emails.len());
@@ -56,18 +57,12 @@ fn load_input() -> Result<ActorInput, ActorError> {
     Err(ActorError::InputNotFound(joined))
 }
 
-fn normalize_input(input: ActorInput) -> Result<(Vec<String>, String), ActorError> {
-    let ActorInput {
-        email,
-        emails,
-        api_token,
-    } = input;
-
+fn normalize_emails(input: ActorInput) -> Result<Vec<String>, ActorError> {
     let mut all_emails = Vec::new();
-    if let Some(email) = email {
+    if let Some(email) = input.email {
         all_emails.push(email);
     }
-    all_emails.extend(emails);
+    all_emails.extend(input.emails);
 
     if all_emails.is_empty() {
         return Err(ActorError::EmptyEmails);
@@ -78,12 +73,16 @@ fn normalize_input(input: ActorInput) -> Result<(Vec<String>, String), ActorErro
         .map(|email| email.trim().to_owned())
         .collect();
 
-    let token = api_token.unwrap_or_default().trim().to_owned();
+    Ok(emails)
+}
+
+fn normalize_api_token(raw_token: Option<String>) -> Result<String, ActorError> {
+    let token = raw_token.unwrap_or_default().trim().to_owned();
     if token.is_empty() {
         return Err(ActorError::MissingApiToken);
     }
 
-    Ok((emails, token))
+    Ok(token)
 }
 
 struct DatasetWriter {
@@ -143,11 +142,11 @@ fn next_dataset_index(dataset_dir: &Path) -> Result<u64, ActorError> {
 
 #[cfg(test)]
 mod tests {
-    use super::normalize_input;
+    use super::{normalize_api_token, normalize_emails};
     use crate::models::ActorInput;
 
     #[test]
-    fn normalize_input_trims_and_keeps_all_emails() {
+    fn normalize_emails_trims_and_keeps_all_emails() {
         let input = ActorInput {
             email: Some(" single@example.com ".to_string()),
             emails: vec![
@@ -155,10 +154,9 @@ mod tests {
                 "".to_string(),
                 "user@example.com".to_string(),
             ],
-            api_token: Some(" token-123 ".to_string()),
         };
 
-        let (emails, token) = normalize_input(input).expect("normalized input should be returned");
+        let emails = normalize_emails(input).expect("normalized emails should be returned");
         assert_eq!(
             emails,
             vec![
@@ -168,30 +166,35 @@ mod tests {
                 "user@example.com".to_string()
             ]
         );
-        assert_eq!(token, "token-123".to_string());
     }
 
     #[test]
-    fn normalize_input_rejects_missing_email_input() {
+    fn normalize_emails_rejects_missing_email_input() {
         let input = ActorInput {
             email: None,
             emails: vec![],
-            api_token: Some("token-123".to_string()),
         };
 
-        let result = normalize_input(input);
+        let result = normalize_emails(input);
         assert!(result.is_err());
     }
 
     #[test]
-    fn normalize_input_rejects_missing_token() {
-        let input = ActorInput {
-            email: Some("user@example.com".to_string()),
-            emails: vec![],
-            api_token: None,
-        };
+    fn normalize_api_token_rejects_missing_token() {
+        let result = normalize_api_token(None);
+        assert!(result.is_err());
+    }
 
-        let result = normalize_input(input);
+    #[test]
+    fn normalize_api_token_uses_trimmed_value() {
+        let token = normalize_api_token(Some(" env-token ".to_string()))
+            .expect("normalized token should be returned");
+        assert_eq!(token, "env-token".to_string());
+    }
+
+    #[test]
+    fn normalize_api_token_rejects_blank_token() {
+        let result = normalize_api_token(Some("   ".to_string()));
         assert!(result.is_err());
     }
 }

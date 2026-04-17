@@ -17,7 +17,7 @@ pub enum ActorError {
     SerializeDatasetItem(serde_json::Error),
     #[error("input must contain at least one email")]
     EmptyEmails,
-    #[error("input must include apiToken")]
+    #[error("missing API token; set VALIDATION_API_TOKEN env var")]
     MissingApiToken,
     #[error("request to validation API failed: {0}")]
     RequestFailed(#[from] reqwest::Error),
