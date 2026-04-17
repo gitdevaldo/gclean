@@ -17,6 +17,12 @@ pub fn default_key_value_store_id() -> String {
         .unwrap_or_else(|_| "default".to_string())
 }
 
+pub fn default_dataset_id() -> String {
+    env::var("ACTOR_DEFAULT_DATASET_ID")
+        .or_else(|_| env::var("APIFY_DEFAULT_DATASET_ID"))
+        .unwrap_or_else(|_| "default".to_string())
+}
+
 pub fn apify_api_base_url() -> Option<String> {
     let value = env::var("APIFY_API_BASE_URL")
         .or_else(|_| env::var("APIFY_API_PUBLIC_BASE_URL"))
@@ -69,9 +75,13 @@ pub fn input_file_candidates() -> Vec<PathBuf> {
 }
 
 pub fn default_dataset_dir() -> PathBuf {
+    let dataset_id = default_dataset_id();
+
     if let Ok(storage_dir) = env::var("APIFY_LOCAL_STORAGE_DIR") {
-        return PathBuf::from(storage_dir).join("datasets/default");
+        return PathBuf::from(storage_dir).join("datasets").join(dataset_id);
     }
 
-    PathBuf::from("/tmp/apify_storage/datasets/default")
+    PathBuf::from("/tmp/apify_storage")
+        .join("datasets")
+        .join(dataset_id)
 }
