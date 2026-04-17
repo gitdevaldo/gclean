@@ -78,7 +78,7 @@ Each result row contains:
 - `email`
 - `status` (`true`, `false`, or `error`, sourced from API `results[].status`)
 - `valid` (`true`, `false`, or `error` as text)
-- flattened `flags_*` and `check_*` columns from API `results[]`
+- flattened `flags_*` columns from API `results[]`
 
 ---
 

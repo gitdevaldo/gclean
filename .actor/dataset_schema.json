@@ -13,7 +13,7 @@
             "status": {
                 "type": "string",
                 "title": "Status",
-                "description": "Validation status from API results[].status: true, false, or error.",
+                "description": "Validation status from API results[0].status.",
                 "enum": [
                     "true",
                     "false",
@@ -24,7 +24,7 @@
             "valid": {
                 "type": "string",
                 "title": "Valid",
-                "description": "Normalized valid flag as text: true, false, or error.",
+                "description": "Valid flag as text value.",
                 "enum": [
                     "true",
                     "false",
@@ -51,114 +51,6 @@
             "flags_pwned_signal": {
                 "type": "string",
                 "title": "Flag Pwned Signal"
-            },
-            "check_format_status": {
-                "type": "string",
-                "title": "Format Status"
-            },
-            "check_format_message": {
-                "type": "string",
-                "title": "Format Message"
-            },
-            "check_format_detail": {
-                "type": "string",
-                "title": "Format Detail"
-            },
-            "check_domain_existence_status": {
-                "type": "string",
-                "title": "Domain Existence Status"
-            },
-            "check_domain_existence_message": {
-                "type": "string",
-                "title": "Domain Existence Message"
-            },
-            "check_domain_existence_detail": {
-                "type": "string",
-                "title": "Domain Existence Detail"
-            },
-            "check_mx_records_status": {
-                "type": "string",
-                "title": "MX Records Status"
-            },
-            "check_mx_records_message": {
-                "type": "string",
-                "title": "MX Records Message"
-            },
-            "check_mx_records_detail": {
-                "type": "string",
-                "title": "MX Records Detail"
-            },
-            "check_disposable_temp_mail_status": {
-                "type": "string",
-                "title": "Disposable Temp Mail Status"
-            },
-            "check_disposable_temp_mail_message": {
-                "type": "string",
-                "title": "Disposable Temp Mail Message"
-            },
-            "check_disposable_temp_mail_detail": {
-                "type": "string",
-                "title": "Disposable Temp Mail Detail"
-            },
-            "check_role_based_status": {
-                "type": "string",
-                "title": "Role Based Check Status"
-            },
-            "check_role_based_message": {
-                "type": "string",
-                "title": "Role Based Check Message"
-            },
-            "check_role_based_detail": {
-                "type": "string",
-                "title": "Role Based Check Detail"
-            },
-            "check_smtp_verification_status": {
-                "type": "string",
-                "title": "SMTP Verification Status"
-            },
-            "check_smtp_verification_message": {
-                "type": "string",
-                "title": "SMTP Verification Message"
-            },
-            "check_smtp_verification_detail": {
-                "type": "string",
-                "title": "SMTP Verification Detail"
-            },
-            "check_pwned_check_status": {
-                "type": "string",
-                "title": "Pwned Check Status"
-            },
-            "check_pwned_check_message": {
-                "type": "string",
-                "title": "Pwned Check Message"
-            },
-            "check_pwned_check_detail": {
-                "type": "string",
-                "title": "Pwned Check Detail"
-            },
-            "check_catch_all_detection_status": {
-                "type": "string",
-                "title": "Catch All Detection Status"
-            },
-            "check_catch_all_detection_message": {
-                "type": "string",
-                "title": "Catch All Detection Message"
-            },
-            "check_catch_all_detection_detail": {
-                "type": "string",
-                "title": "Catch All Detection Detail"
-            },
-            "check_spam_trap_detection_status": {
-                "type": "string",
-                "title": "Spam Trap Detection Status"
-            },
-            "check_spam_trap_detection_message": {
-                "type": "string",
-                "title": "Spam Trap Detection Message"
-            },
-            "check_spam_trap_detection_detail": {
-                "type": "string",
-                "title": "Spam Trap Detection Detail"
             }
         },
         "required": [
@@ -170,7 +62,7 @@
     "views": {
         "overview": {
             "title": "Overview",
-            "description": "Validation API responses with flattened flags and checks.",
+            "description": "Validation API responses with flags.",
             "transformation": {
                 "fields": [
                     "email",
@@ -180,34 +72,7 @@
                     "flags_role_based",
                     "flags_catch_all",
                     "flags_spam_trap",
-                    "flags_pwned_signal",
-                    "check_format_status",
-                    "check_format_message",
-                    "check_format_detail",
-                    "check_domain_existence_status",
-                    "check_domain_existence_message",
-                    "check_domain_existence_detail",
-                    "check_mx_records_status",
-                    "check_mx_records_message",
-                    "check_mx_records_detail",
-                    "check_disposable_temp_mail_status",
-                    "check_disposable_temp_mail_message",
-                    "check_disposable_temp_mail_detail",
-                    "check_role_based_status",
-                    "check_role_based_message",
-                    "check_role_based_detail",
-                    "check_smtp_verification_status",
-                    "check_smtp_verification_message",
-                    "check_smtp_verification_detail",
-                    "check_pwned_check_status",
-                    "check_pwned_check_message",
-                    "check_pwned_check_detail",
-                    "check_catch_all_detection_status",
-                    "check_catch_all_detection_message",
-                    "check_catch_all_detection_detail",
-                    "check_spam_trap_detection_status",
-                    "check_spam_trap_detection_message",
-                    "check_spam_trap_detection_detail"
+                    "flags_pwned_signal"
                 ]
             },
             "display": {
@@ -223,6 +88,26 @@
                     },
                     "valid": {
                         "label": "Valid",
+                        "format": "text"
+                    },
+                    "flags_disposable": {
+                        "label": "Disposable",
+                        "format": "text"
+                    },
+                    "flags_role_based": {
+                        "label": "Role Based",
+                        "format": "text"
+                    },
+                    "flags_catch_all": {
+                        "label": "Catch All",
+                        "format": "text"
+                    },
+                    "flags_spam_trap": {
+                        "label": "Spam Trap",
+                        "format": "text"
+                    },
+                    "flags_pwned_signal": {
+                        "label": "Pwned Signal",
                         "format": "text"
                     }
                 }
