@@ -2,7 +2,13 @@
     "actorSpecification": 1,
     "name": "email-validation-service",
     "title": "Email Validation Service",
-    "version": "1.0.0",
+    "version": "1.0",
+    "buildTag": "latest",
+    "minMemoryMbytes": 256,
+    "maxMemoryMbytes": 2048,
+    "defaultMemoryMbytes": 512,
+    "usesStandbyMode": false,
+    "readme": "../README.md",
     "input": "./input_schema.json",
     "storages": {
         "dataset": "./dataset_schema.json"

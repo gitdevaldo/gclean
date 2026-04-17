@@ -1,34 +1,37 @@
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::Json;
-use serde::Serialize;
+use std::path::PathBuf;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum ApiError {
-    #[error("{0}")]
-    BadRequest(String),
-    #[error("internal server error")]
-    Internal,
+pub enum ActorError {
+    #[error("input not found; expected one of: {0}")]
+    InputNotFound(String),
+    #[error("failed to read input file {path}: {source}")]
+    ReadInputFile {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+    #[error("input JSON is invalid: {0}")]
+    InvalidInputJson(#[from] serde_json::Error),
+    #[error("failed to serialize dataset item: {0}")]
+    SerializeDatasetItem(serde_json::Error),
+    #[error("input must contain at least one email")]
+    EmptyEmails,
+    #[error("request to validation API failed: {0}")]
+    RequestFailed(#[from] reqwest::Error),
+    #[error("failed to create dataset directory {path}: {source}")]
+    CreateDatasetDir {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+    #[error("failed to scan dataset directory {path}: {source}")]
+    ScanDatasetDir {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+    #[error("failed to write dataset item {path}: {source}")]
+    WriteDatasetItem {
+        path: PathBuf,
+        source: std::io::Error,
+    },
 }
-
-#[derive(Serialize)]
-struct ErrorBody {
-    error: String,
-}
-
-impl IntoResponse for ApiError {
-    fn into_response(self) -> Response {
-        let (status, message) = match self {
-            Self::BadRequest(message) => (StatusCode::BAD_REQUEST, message),
-            Self::Internal => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "internal server error".to_string(),
-            ),
-        };
-
-        (status, Json(ErrorBody { error: message })).into_response()
-    }
-}
-
-pub type ApiResult<T> = Result<T, ApiError>;
