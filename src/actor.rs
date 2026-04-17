@@ -57,12 +57,17 @@ fn load_input() -> Result<ActorInput, ActorError> {
 }
 
 fn normalize_emails(input: ActorInput) -> Result<Vec<String>, ActorError> {
-    if input.emails.is_empty() {
+    let mut all_emails = Vec::new();
+    if let Some(email) = input.email {
+        all_emails.push(email);
+    }
+    all_emails.extend(input.emails);
+
+    if all_emails.is_empty() {
         return Err(ActorError::EmptyEmails);
     }
 
-    let emails: Vec<String> = input
-        .emails
+    let emails: Vec<String> = all_emails
         .into_iter()
         .map(|email| email.trim().to_owned())
         .collect();
@@ -132,6 +137,7 @@ mod tests {
     #[test]
     fn normalize_emails_trims_and_keeps_all_inputs() {
         let input = ActorInput {
+            email: Some(" single@example.com ".to_string()),
             emails: vec![
                 " user@example.com ".to_string(),
                 "".to_string(),
@@ -143,10 +149,22 @@ mod tests {
         assert_eq!(
             output,
             vec![
+                "single@example.com".to_string(),
                 "user@example.com".to_string(),
                 "".to_string(),
                 "user@example.com".to_string()
             ]
         );
+    }
+
+    #[test]
+    fn normalize_emails_rejects_missing_email_input() {
+        let input = ActorInput {
+            email: None,
+            emails: vec![],
+        };
+
+        let result = normalize_emails(input);
+        assert!(result.is_err());
     }
 }

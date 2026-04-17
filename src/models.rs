@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize)]
 pub struct ActorInput {
     #[serde(default)]
+    pub email: Option<String>,
+    #[serde(default)]
     pub emails: Vec<String>,
 }
 

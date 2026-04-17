@@ -1,0 +1,16 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Output schema of Email Validation Service",
+    "properties": {
+        "overview": {
+            "type": "string",
+            "title": "Overview",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        },
+        "rawItems": {
+            "type": "string",
+            "title": "Raw dataset items",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}

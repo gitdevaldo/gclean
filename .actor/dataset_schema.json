@@ -22,7 +22,20 @@
                 "description": "Error message returned by the API for invalid requests.",
                 "example": "email must not be empty"
             }
-        }
+        },
+        "oneOf": [
+            {
+                "required": [
+                    "email",
+                    "valid"
+                ]
+            },
+            {
+                "required": [
+                    "error"
+                ]
+            }
+        ]
     },
     "views": {
         "overview": {

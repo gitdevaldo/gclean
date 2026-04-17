@@ -4,6 +4,12 @@
     "type": "object",
     "schemaVersion": 1,
     "properties": {
+        "email": {
+            "title": "Email",
+            "type": "string",
+            "description": "Single email address to validate.",
+            "prefill": "hello@example.com"
+        },
         "emails": {
             "title": "Emails",
             "type": "array",
@@ -16,8 +22,5 @@
                 "hello@example.com"
             ]
         }
-    },
-    "required": [
-        "emails"
-    ]
+    }
 }
