@@ -19,10 +19,15 @@ impl EmailValidationService {
         Ok(Self { client })
     }
 
-    pub async fn validate(&self, email: String) -> Result<ValidationResponse, ActorError> {
+    pub async fn validate(
+        &self,
+        email: String,
+        api_token: &str,
+    ) -> Result<ValidationResponse, ActorError> {
         let response = self
             .client
             .post(VALIDATION_API_URL)
+            .bearer_auth(api_token)
             .json(&ValidationRequest { email })
             .send()
             .await?;

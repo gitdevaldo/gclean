@@ -67,6 +67,7 @@ And honestly? It's cheap. Way cheaper than the damage a bad list does to your de
 |---|---|---|---|
 | email | String | Yes | A single email address to validate |
 | emails | Array | Yes (or use `email`) | A list of email addresses to validate in bulk |
+| apiToken | String (Secret) | Yes | API token sent as `Authorization: Bearer <token>` |
 
 ---
 

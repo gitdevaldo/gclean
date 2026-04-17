@@ -22,6 +22,16 @@
             "prefill": [
                 "hello@example.com"
             ]
+        },
+        "apiToken": {
+            "title": "API Token",
+            "type": "string",
+            "editor": "textfield",
+            "description": "Secret token used for Authorization: Bearer <token> when calling the validation API.",
+            "isSecret": true
         }
-    }
+    },
+    "required": [
+        "apiToken"
+    ]
 }
