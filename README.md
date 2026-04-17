@@ -74,7 +74,9 @@ Set the actor secret in environment variables as:
 
 ## Output
 
-For each email you'll get back a clean result telling you whether it's valid or not, so you can filter your list before it does any damage.
+Each result row contains:
+- `email`
+- `status` (`true`, `false`, or `error`)
 
 ---
 

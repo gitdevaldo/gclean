@@ -10,7 +10,7 @@ use crate::config::{
     default_key_value_store_id, input_file_candidates,
 };
 use crate::error::ActorError;
-use crate::models::{ActorInput, ValidationResponse};
+use crate::models::{ActorInput, DatasetResult, ValidationResponse};
 use crate::service::EmailValidationService;
 
 pub async fn run() -> Result<(), ActorError> {
@@ -21,8 +21,9 @@ pub async fn run() -> Result<(), ActorError> {
 
     let mut results = Vec::with_capacity(emails.len());
     for email in emails {
-        let result = service.validate(email, &api_token).await?;
-        results.push(result);
+        let response = service.validate(email.clone(), &api_token).await?;
+        let status = status_from_response(response);
+        results.push(DatasetResult { email, status });
     }
 
     append_results(&results).await?;
@@ -105,7 +106,7 @@ async fn load_input_from_apify_api() -> Result<Option<String>, ActorError> {
     Ok(Some(payload))
 }
 
-async fn append_results(items: &[ValidationResponse]) -> Result<(), ActorError> {
+async fn append_results(items: &[DatasetResult]) -> Result<(), ActorError> {
     if append_results_to_apify_api(items).await? {
         return Ok(());
     }
@@ -114,7 +115,7 @@ async fn append_results(items: &[ValidationResponse]) -> Result<(), ActorError> 
     dataset_writer.append(items)
 }
 
-async fn append_results_to_apify_api(items: &[ValidationResponse]) -> Result<bool, ActorError> {
+async fn append_results_to_apify_api(items: &[DatasetResult]) -> Result<bool, ActorError> {
     let token = match env::var("APIFY_TOKEN").ok() {
         Some(value) if !value.trim().is_empty() => value,
         _ => return Ok(false),
@@ -172,6 +173,13 @@ fn normalize_api_token(raw_token: Option<String>) -> Result<String, ActorError> 
     Ok(token)
 }
 
+fn status_from_response(response: ValidationResponse) -> String {
+    match response {
+        ValidationResponse::Success { valid, .. } => valid.to_string(),
+        ValidationResponse::Error { .. } => "error".to_string(),
+    }
+}
+
 struct DatasetWriter {
     dataset_dir: PathBuf,
 }
@@ -185,7 +193,7 @@ impl DatasetWriter {
         Ok(Self { dataset_dir })
     }
 
-    fn append(&self, items: &[ValidationResponse]) -> Result<(), ActorError> {
+    fn append(&self, items: &[DatasetResult]) -> Result<(), ActorError> {
         let mut index = next_dataset_index(&self.dataset_dir)?;
         for item in items {
             let path = self.dataset_dir.join(format!("{index:09}.json"));
@@ -229,8 +237,9 @@ fn next_dataset_index(dataset_dir: &Path) -> Result<u64, ActorError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{normalize_api_token, normalize_emails};
+    use super::{normalize_api_token, normalize_emails, status_from_response};
     use crate::models::ActorInput;
+    use crate::models::ValidationResponse;
 
     #[test]
     fn normalize_emails_trims_and_keeps_all_emails() {
@@ -278,5 +287,29 @@ mod tests {
     fn normalize_api_token_rejects_blank_token() {
         let result = normalize_api_token(Some("   ".to_string()));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn status_from_response_returns_true_false_or_error() {
+        assert_eq!(
+            status_from_response(ValidationResponse::Success {
+                email: "a@example.com".to_string(),
+                valid: true
+            }),
+            "true".to_string()
+        );
+        assert_eq!(
+            status_from_response(ValidationResponse::Success {
+                email: "a@example.com".to_string(),
+                valid: false
+            }),
+            "false".to_string()
+        );
+        assert_eq!(
+            status_from_response(ValidationResponse::Error {
+                error: "bad".to_string()
+            }),
+            "error".to_string()
+        );
     }
 }

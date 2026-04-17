@@ -7,34 +7,24 @@
             "email": {
                 "type": "string",
                 "title": "Email",
-                "description": "Email address returned by the validation API.",
+                "description": "Email address from actor input.",
                 "example": "hello@example.com"
             },
-            "valid": {
-                "type": "boolean",
-                "title": "Valid",
-                "description": "Validation decision returned by the API.",
-                "example": true
-            },
-            "error": {
+            "status": {
                 "type": "string",
-                "title": "Error",
-                "description": "Error message returned by the API for invalid requests.",
-                "example": "email must not be empty"
+                "title": "Status",
+                "description": "Validation status: true, false, or error.",
+                "enum": [
+                    "true",
+                    "false",
+                    "error"
+                ],
+                "example": "true"
             }
         },
-        "oneOf": [
-            {
-                "required": [
-                    "email",
-                    "valid"
-                ]
-            },
-            {
-                "required": [
-                    "error"
-                ]
-            }
+        "required": [
+            "email",
+            "status"
         ]
     },
     "views": {
@@ -44,8 +34,7 @@
             "transformation": {
                 "fields": [
                     "email",
-                    "valid",
-                    "error"
+                    "status"
                 ]
             },
             "display": {
@@ -55,12 +44,8 @@
                         "label": "Email",
                         "format": "text"
                     },
-                    "valid": {
-                        "label": "Valid",
-                        "format": "boolean"
-                    },
-                    "error": {
-                        "label": "Error",
+                    "status": {
+                        "label": "Status",
                         "format": "text"
                     }
                 }

@@ -17,3 +17,9 @@ pub enum ValidationResponse {
     Success { email: String, valid: bool },
     Error { error: String },
 }
+
+#[derive(Debug, Serialize)]
+pub struct DatasetResult {
+    pub email: String,
+    pub status: String,
+}
