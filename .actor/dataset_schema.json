@@ -13,13 +13,8 @@
             "status": {
                 "type": "string",
                 "title": "Status",
-                "description": "Validation status from API results[0].status.",
-                "enum": [
-                    "true",
-                    "false",
-                    "error"
-                ],
-                "example": "true"
+                "description": "Validation status from API results[0].status (raw value, unchanged).",
+                "example": "false"
             },
             "valid": {
                 "type": "string",
