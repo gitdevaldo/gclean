@@ -1,5 +1,7 @@
 # GClean ✉️
 
+**Version:** `1.1`
+
 **Say no to bounce emails. Forever.**
 
 You've been there — you blast out a campaign, and half your emails bounce. Your sender reputation tanks, your ESP flags your account, and you're left wondering why you even bothered. GClean fixes that.
