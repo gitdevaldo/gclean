@@ -76,7 +76,7 @@ Set the actor secret in environment variables as:
 
 Each result row contains:
 - `email`
-- `status` (`true`, `false`, or `error`)
+- `status` (`true`, `false`, or `error`, sourced from API `results[].status`)
 
 ---
 

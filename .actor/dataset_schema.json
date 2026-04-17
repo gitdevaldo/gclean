@@ -13,7 +13,7 @@
             "status": {
                 "type": "string",
                 "title": "Status",
-                "description": "Validation status: true, false, or error.",
+                "description": "Validation status from API results[].status: true, false, or error.",
                 "enum": [
                     "true",
                     "false",

@@ -11,7 +11,7 @@ use crate::config::{
     default_key_value_store_id, input_file_candidates, REQUEST_DELAY_SECONDS,
 };
 use crate::error::ActorError;
-use crate::models::{ActorInput, DatasetResult, ValidationResponse};
+use crate::models::{ActorInput, DatasetResult};
 use crate::service::EmailValidationService;
 
 pub async fn run() -> Result<(), ActorError> {
@@ -22,9 +22,11 @@ pub async fn run() -> Result<(), ActorError> {
 
     let mut results = Vec::with_capacity(emails.len());
     for email in emails {
-        let response = service.validate(email.clone(), &api_token).await?;
-        let status = status_from_response(response);
-        results.push(DatasetResult { email, status });
+        let mut result = service.validate(email.clone(), &api_token).await?;
+        if result.email.is_empty() {
+            result.email = email;
+        }
+        results.push(result);
         sleep(Duration::from_secs(REQUEST_DELAY_SECONDS)).await;
     }
 
@@ -175,13 +177,6 @@ fn normalize_api_token(raw_token: Option<String>) -> Result<String, ActorError> 
     Ok(token)
 }
 
-fn status_from_response(response: ValidationResponse) -> String {
-    match response {
-        ValidationResponse::Success { valid, .. } => valid.to_string(),
-        ValidationResponse::Error { .. } => "error".to_string(),
-    }
-}
-
 struct DatasetWriter {
     dataset_dir: PathBuf,
 }
@@ -239,9 +234,8 @@ fn next_dataset_index(dataset_dir: &Path) -> Result<u64, ActorError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{normalize_api_token, normalize_emails, status_from_response};
+    use super::{normalize_api_token, normalize_emails};
     use crate::models::ActorInput;
-    use crate::models::ValidationResponse;
 
     #[test]
     fn normalize_emails_trims_and_keeps_all_emails() {
@@ -289,29 +283,5 @@ mod tests {
     fn normalize_api_token_rejects_blank_token() {
         let result = normalize_api_token(Some("   ".to_string()));
         assert!(result.is_err());
-    }
-
-    #[test]
-    fn status_from_response_returns_true_false_or_error() {
-        assert_eq!(
-            status_from_response(ValidationResponse::Success {
-                email: "a@example.com".to_string(),
-                valid: true
-            }),
-            "true".to_string()
-        );
-        assert_eq!(
-            status_from_response(ValidationResponse::Success {
-                email: "a@example.com".to_string(),
-                valid: false
-            }),
-            "false".to_string()
-        );
-        assert_eq!(
-            status_from_response(ValidationResponse::Error {
-                error: "bad".to_string()
-            }),
-            "error".to_string()
-        );
     }
 }

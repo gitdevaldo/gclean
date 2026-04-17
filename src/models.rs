@@ -11,10 +11,23 @@ pub struct ValidationRequest {
     pub email: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize)]
+pub struct ValidationApiEnvelope {
+    pub results: Vec<ValidationApiResult>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ValidationApiResult {
+    pub email: String,
+    pub status: String,
+    pub valid: bool,
+}
+
+#[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum ValidationResponse {
-    Success { email: String, valid: bool },
+pub enum ValidationApiResponse {
+    Envelope(ValidationApiEnvelope),
+    LegacySuccess { email: String, valid: bool },
     Error { error: String },
 }
 
