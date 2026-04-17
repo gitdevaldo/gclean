@@ -8,8 +8,7 @@
             "title": "Email",
             "type": "string",
             "editor": "textfield",
-            "description": "Single email address to validate.",
-            "prefill": "hello@example.com"
+            "description": "Single email address to validate."
         },
         "emails": {
             "title": "Emails",
