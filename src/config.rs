@@ -7,18 +7,35 @@ pub const DEFAULT_LOG_LEVEL: &str = "info";
 
 pub fn input_file_candidates() -> Vec<PathBuf> {
     let mut candidates = Vec::new();
+    let input_key = env::var("APIFY_INPUT_KEY").unwrap_or_else(|_| "INPUT".to_string());
+    let store_id =
+        env::var("APIFY_DEFAULT_KEY_VALUE_STORE_ID").unwrap_or_else(|_| "default".to_string());
+
+    let store_relative_path = PathBuf::from("key_value_stores")
+        .join(&store_id)
+        .join(&input_key);
 
     if let Ok(storage_dir) = env::var("APIFY_LOCAL_STORAGE_DIR") {
-        candidates.push(PathBuf::from(&storage_dir).join("key_value_stores/default/INPUT.json"));
-        candidates.push(PathBuf::from(storage_dir).join("key_value_stores/default/INPUT"));
+        candidates.push(
+            PathBuf::from(&storage_dir)
+                .join(&store_relative_path)
+                .with_extension("json"),
+        );
+        candidates.push(PathBuf::from(storage_dir).join(&store_relative_path));
     }
 
-    candidates.push(PathBuf::from(
-        "/tmp/apify_storage/key_value_stores/default/INPUT.json",
-    ));
-    candidates.push(PathBuf::from(
-        "./storage/key_value_stores/default/INPUT.json",
-    ));
+    candidates.push(
+        PathBuf::from("/tmp/apify_storage")
+            .join(&store_relative_path)
+            .with_extension("json"),
+    );
+    candidates.push(PathBuf::from("/tmp/apify_storage").join(&store_relative_path));
+    candidates.push(
+        PathBuf::from("./storage")
+            .join(&store_relative_path)
+            .with_extension("json"),
+    );
+    candidates.push(PathBuf::from("./storage").join(store_relative_path));
 
     candidates
 }
