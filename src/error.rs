@@ -19,6 +19,10 @@ pub enum ActorError {
     EmptyEmails,
     #[error("missing API token; set VALIDATION_API_TOKEN env var")]
     MissingApiToken,
+    #[error("failed to fetch actor input from Apify API: {0}")]
+    FetchApifyInput(reqwest::Error),
+    #[error("failed to fetch actor input from Apify API ({url}): HTTP {status}")]
+    FetchApifyInputStatus { url: String, status: u16 },
     #[error("request to validation API failed: {0}")]
     RequestFailed(#[from] reqwest::Error),
     #[error("failed to create dataset directory {path}: {source}")]

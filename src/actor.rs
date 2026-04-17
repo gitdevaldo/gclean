@@ -2,15 +2,19 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use reqwest::StatusCode;
 use tracing::info;
 
-use crate::config::{default_dataset_dir, input_file_candidates};
+use crate::config::{
+    actor_input_key, apify_api_base_url, default_dataset_dir, default_key_value_store_id,
+    input_file_candidates,
+};
 use crate::error::ActorError;
 use crate::models::{ActorInput, ValidationResponse};
 use crate::service::EmailValidationService;
 
 pub async fn run() -> Result<(), ActorError> {
-    let input = load_input()?;
+    let input = load_input().await?;
     let emails = normalize_emails(input)?;
     let api_token = normalize_api_token(env::var("VALIDATION_API_TOKEN").ok())?;
     let service = EmailValidationService::new()?;
@@ -31,7 +35,7 @@ pub async fn run() -> Result<(), ActorError> {
     Ok(())
 }
 
-fn load_input() -> Result<ActorInput, ActorError> {
+async fn load_input() -> Result<ActorInput, ActorError> {
     if let Ok(raw_json) = env::var("ACTOR_INPUT_JSON") {
         return Ok(serde_json::from_str::<ActorInput>(&raw_json)?);
     }
@@ -48,6 +52,10 @@ fn load_input() -> Result<ActorInput, ActorError> {
         }
     }
 
+    if let Some(raw_json) = load_input_from_apify_api().await? {
+        return Ok(serde_json::from_str::<ActorInput>(&raw_json)?);
+    }
+
     let joined = candidates
         .iter()
         .map(|path| path.display().to_string())
@@ -55,6 +63,47 @@ fn load_input() -> Result<ActorInput, ActorError> {
         .join(", ");
 
     Err(ActorError::InputNotFound(joined))
+}
+
+async fn load_input_from_apify_api() -> Result<Option<String>, ActorError> {
+    let token = match env::var("APIFY_TOKEN").ok() {
+        Some(value) if !value.trim().is_empty() => value,
+        _ => return Ok(None),
+    };
+
+    let Some(base_url) = apify_api_base_url() else {
+        return Ok(None);
+    };
+
+    let store_id = default_key_value_store_id();
+    let input_key = actor_input_key();
+    let url = format!(
+        "{}/v2/key-value-stores/{}/records/{}?disableRedirect=true",
+        base_url.trim_end_matches('/'),
+        store_id,
+        input_key
+    );
+
+    let response = reqwest::Client::new()
+        .get(&url)
+        .bearer_auth(token)
+        .send()
+        .await
+        .map_err(ActorError::FetchApifyInput)?;
+
+    if response.status() == StatusCode::NOT_FOUND {
+        return Ok(None);
+    }
+
+    if !response.status().is_success() {
+        return Err(ActorError::FetchApifyInputStatus {
+            url,
+            status: response.status().as_u16(),
+        });
+    }
+
+    let payload = response.text().await.map_err(ActorError::FetchApifyInput)?;
+    Ok(Some(payload))
 }
 
 fn normalize_emails(input: ActorInput) -> Result<Vec<String>, ActorError> {
