@@ -1,15 +1,9 @@
 {
     "title": "Email Validation Service Input",
-    "description": "Provide one or more emails to validate through the external validation API.",
+    "description": "Provide emails to validate. Use one item for single validation or multiple items for bulk.",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-        "email": {
-            "title": "Email",
-            "type": "string",
-            "editor": "textfield",
-            "description": "Single email address to validate."
-        },
         "emails": {
             "title": "Emails",
             "type": "array",
@@ -19,5 +13,8 @@
                 "type": "string"
             }
         }
-    }
+    },
+    "required": [
+        "emails"
+    ]
 }

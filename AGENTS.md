@@ -30,7 +30,7 @@ AGENTS.md
 
 ## Project-specific behavior
 
-- Input supports either `email` (single) or `emails` (batch).
+- Input supports only `emails` (single = one item, batch = multiple items).
 - Each email is sent to: `https://zrbot.devaldo.workers.dev/v1/validate-email`.
 - Dataset items mirror the API response shape:
   - success: `{ "email": "...", "valid": true|false }`

@@ -65,8 +65,7 @@ And honestly? It's cheap. Way cheaper than the damage a bad list does to your de
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| email | String | No (use `email` or `emails`) | A single email address to validate |
-| emails | Array | No (use `email` or `emails`) | A list of email addresses to validate in bulk |
+| emails | Array | Yes | A JSON array of emails. Use one item for single validation or multiple items for bulk |
 
 Set the actor secret in environment variables as:
 `VALIDATION_API_TOKEN`
